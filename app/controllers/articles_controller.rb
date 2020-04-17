@@ -29,6 +29,7 @@ class ArticlesController < ApplicationController
     
     respond_to do |format|
       if @article.save
+        #redirects uses prefix, this is a shortend to redirect to show action
         format.html { redirect_to @article, notice: 'Article was successfully created.' }
         format.json { render :show, status: :created, location: @article }
       else
