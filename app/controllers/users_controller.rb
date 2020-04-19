@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
   before_action :set_user, only: [:show, :edit, :update, :destroy]
-
+  before_action :require_same_user, only: [:edit, :update]
   # GET /users
   # GET /users.json
   def index
@@ -29,8 +29,11 @@ class UsersController < ApplicationController
 
     respond_to do |format|
       if @user.save
+        #so users' are logged in once they sign-up
+        session[:user_id] = @user.id
         #redirects uses prefix, this is a shortend to redirect to show action
-        format.html { redirect_to @user, notice: 'User was successfully created.' }
+        #string interpolation with #{}
+        format.html { redirect_to @user, notice: "Welcome to the Alpha Blog #{@user.username}, you have successfully signed up" }
         format.json { render :show, status: :created, location: @user }
       else
         format.html { render :new }
@@ -72,5 +75,11 @@ class UsersController < ApplicationController
     # Only allow a list of trusted parameters through.
     def user_params
       params.require(:user).permit(:username)
+    end
+
+    def require_same_user
+      if current_user != @user
+        flash[:danger] = "You can only edit your own account"      
+        redirect_to root_path
     end
 end
